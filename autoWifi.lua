@@ -1,29 +1,33 @@
-ap_failback_ssid = "ESP" .. string.sub(wifi.ap.getmac(), 6)
-ap_failback_pwd = "MyPassword"
+local autoWifi = {}
 
-function setupAsAccessPoint()
+local ap_failback_ssid = "ESP" .. string.sub(wifi.ap.getmac(), 6)
+local ap_failback_pwd = "MyPassword"
+
+local function setupAsAccessPoint()
     wifi.setmode(wifi.SOFTAP)
     wifi.ap.config({ssid=ap_failback_ssid, pwd=ap_failback_pwd})
+    print("Started in AP wifi mode: " .. ap_failback_ssid .. " " .. wifi.ap.getip())
     return wifi.ap.getip()
 end
 
-function handleConnectAttempt()
+local function handleConnectAttempt()
     -- Check if we're connected to an access point.
     -- If not, we create our own.
     if wifi.sta.getip() == nil then
-        print("We're going AP")
         setupAsAccessPoint()
     else
-        print("We're STA: " .. wifi.sta.getip())
+        print("Started in STA wifi mode: " .. wifi.sta.getip())
     end
 
     ap_failback_ssid = nil
     ap_failback_pwd = nil
 end
 
-function setupWifi(sta_ssid, sta_pwd, ap_ssid, ap_pwd, timeout)
+function autoWifi.setup(sta_ssid, sta_pwd, ip_info, ap_ssid, ap_pwd, timeout)
     wifi.setmode(wifi.STATION)
     wifi.sta.config(sta_ssid, sta_pwd)
+
+    if ip ~= nil then wifi.sta.setip(ip_info) end
 
     if ap_ssid ~= nil then ap_failback_ssid = ap_ssid end
     if ap_pwd ~= nil then ap_failback_pwd = ap_pwd end
@@ -31,3 +35,5 @@ function setupWifi(sta_ssid, sta_pwd, ap_ssid, ap_pwd, timeout)
 
     tmr.alarm(6, timeout, 0, handleConnectAttempt)
 end
+
+return autoWifi
