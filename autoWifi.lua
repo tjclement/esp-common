@@ -13,7 +13,8 @@ end
 local function handleConnectAttempt()
     -- Check if we're connected to an access point.
     -- If not, we create our own.
-    if wifi.sta.getip() == nil then
+    -- (5 is STATION_GOT_IP)
+    if wifi.sta.status() ~= 5 then
         setupAsAccessPoint()
     else
         print("Started in STA wifi mode: " .. wifi.sta.getip())
@@ -26,8 +27,9 @@ end
 function autoWifi.setup(sta_ssid, sta_pwd, ip_info, ap_ssid, ap_pwd, timeout)
     wifi.setmode(wifi.STATION)
     wifi.sta.config(sta_ssid, sta_pwd)
+    wifi.sta.autoconnect(1)
 
-    if ip ~= nil then wifi.sta.setip(ip_info) end
+    if ip_info ~= nil then wifi.sta.setip(ip_info) end
 
     if ap_ssid ~= nil then ap_failback_ssid = ap_ssid end
     if ap_pwd ~= nil then ap_failback_pwd = ap_pwd end
