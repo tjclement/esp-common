@@ -33,7 +33,7 @@ function autoWifi.setup(sta_ssid, sta_pwd, ip_info, ap_ssid, ap_pwd, timeout)
 
     if ap_ssid ~= nil then ap_failback_ssid = ap_ssid end
     if ap_pwd ~= nil then ap_failback_pwd = ap_pwd end
-    if timeout == nil then timeout = 5000 end
+    if timeout == nil then timeout = 10000 end
 
     tmr.alarm(6, timeout, 0, handleConnectAttempt)
 end
